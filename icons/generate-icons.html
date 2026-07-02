@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head><title>Inst-AI-nt Snap — Icon Generator</title></head>
+<body>
+<p>Open this file in a browser and right-click each canvas to "Save image as..." for the PNGs.</p>
+<p>16x16:</p><canvas id="c16" width="16" height="16"></canvas>
+<p>48x48:</p><canvas id="c48" width="48" height="48"></canvas>
+<p>128x128:</p><canvas id="c128" width="128" height="128"></canvas>
+<script>
+function drawIcon(canvas) {
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+  const r = s * 0.1875; // corner radius
+
+  // Rounded rectangle background with gradient
+  const grad = ctx.createLinearGradient(0, 0, s, s);
+  grad.addColorStop(0, '#667eea');
+  grad.addColorStop(1, '#764ba2');
+
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(s - r, 0);
+  ctx.quadraticCurveTo(s, 0, s, r);
+  ctx.lineTo(s, s - r);
+  ctx.quadraticCurveTo(s, s, s - r, s);
+  ctx.lineTo(r, s);
+  ctx.quadraticCurveTo(0, s, 0, s - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Lightning bolt
+  ctx.beginPath();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+  const lx = s * 0.5625; // 72/128
+  const ly = s * 0.15625; // 20/128
+  ctx.moveTo(lx, ly);
+  ctx.lineTo(s * 0.34375, s * 0.53125); // 44, 68
+  ctx.lineTo(s * 0.484375, s * 0.53125); // 62, 68
+  ctx.lineTo(s * 0.40625, s * 0.84375); // 52, 108
+  ctx.lineTo(s * 0.65625, s * 0.4375); // 84, 56
+  ctx.lineTo(s * 0.515625, s * 0.4375); // 66, 56
+  ctx.lineTo(s * 0.5625, s * 0.15625); // 72, 20
+  ctx.closePath();
+  ctx.fill();
+
+  // Subtle camera lens circle
+  ctx.beginPath();
+  ctx.arc(s / 2, s / 2, s * 0.21875, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+  ctx.lineWidth = Math.max(1, s * 0.023);
+  ctx.stroke();
+}
+
+drawIcon(document.getElementById('c16'));
+drawIcon(document.getElementById('c48'));
+drawIcon(document.getElementById('c128'));
+</script>
+</body>
+</html>

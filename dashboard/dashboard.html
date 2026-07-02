@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inst-AI-nt Snap — Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">⚡ Inst-AI-nt Snap</div>
+      <nav>
+        <button class="nav-btn active" data-view="library">📚 Library</button>
+        <button class="nav-btn" data-view="search">🔍 Search</button>
+        <button class="nav-btn" data-view="prompt-builder">🤖 Prompt Builder</button>
+        <button class="nav-btn" data-view="session">📑 Session Capture</button>
+        <button class="nav-btn" data-view="auto-capture">⚡ Auto Capture</button>
+        <button class="nav-btn" data-view="research">📖 Research</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-settings" class="nav-btn">⚙️ Settings</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <!-- Library View -->
+      <section id="view-library" class="view active">
+        <div class="view-header">
+          <h1>Your Library</h1>
+          <span id="total-clips" class="badge">0 clips</span>
+          <span id="storage-used" class="badge">0 KB</span>
+        </div>
+        <div class="library-toolbar">
+          <button id="btn-select-mode" class="btn-secondary" style="padding:6px 12px;font-size:12px;">☑️ Select</button>
+          <div id="bulk-actions" class="bulk-actions hidden">
+            <span id="selected-count">0 selected</span>
+            <select id="bulk-project-select">
+              <option value="">Send to project...</option>
+            </select>
+            <button id="btn-bulk-send" class="btn-secondary" style="padding:6px 12px;font-size:12px;">📁 Send</button>
+            <button id="btn-bulk-delete" class="btn-secondary" style="padding:6px 12px;font-size:12px;color:#f87171;">🗑️ Delete</button>
+            <button id="btn-cancel-select" class="btn-secondary" style="padding:6px 12px;font-size:12px;">✕ Cancel</button>
+          </div>
+        </div>
+        <div id="library-list" class="clip-grid"></div>
+        <div id="library-empty" class="empty-state hidden">
+          <p>No clips yet. Snap a page to get started!</p>
+        </div>
+      </section>
+
+      <!-- Search View -->
+      <section id="view-search" class="view hidden">
+        <div class="view-header">
+          <h1>Search</h1>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="Search across all clips..." autofocus>
+          <button id="btn-search" class="btn-primary">Search</button>
+        </div>
+        <div id="search-results" class="clip-grid"></div>
+        <div id="search-empty" class="empty-state hidden">
+          <p>No results found.</p>
+        </div>
+      </section>
+
+      <!-- Prompt Builder View -->
+      <section id="view-prompt-builder" class="view hidden">
+        <div class="view-header">
+          <h1>AI Prompt Builder</h1>
+          <p class="subtitle">Select clips and combine them into one AI-ready prompt.</p>
+        </div>
+        <div class="prompt-builder-layout">
+          <div class="clip-selector">
+            <h3>Select Clips</h3>
+            <div id="prompt-clips-list" class="clip-list-select"></div>
+          </div>
+          <div class="prompt-config">
+            <h3>Instruction</h3>
+            <div class="preset-buttons">
+              <button class="preset-btn" data-instruction="compare">⚖️ Compare</button>
+              <button class="preset-btn" data-instruction="summarize">📝 Summarize</button>
+              <button class="preset-btn" data-instruction="key points">🎯 Key Points</button>
+              <button class="preset-btn" data-instruction="combine">🔗 Combine</button>
+              <button class="preset-btn" data-instruction="timeline">📅 Timeline</button>
+              <button class="preset-btn" data-instruction="differences">🔍 Differences</button>
+              <button class="preset-btn" data-instruction="pros and cons">⚡ Pros & Cons</button>
+              <button class="preset-btn" data-instruction="explain">💡 Explain</button>
+            </div>
+            <textarea id="prompt-instruction" placeholder="Or write your own instruction..."></textarea>
+            <button id="btn-build-prompt" class="btn-primary">💾 Build & Download Prompt</button>
+            <div id="prompt-status" class="status hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Session Capture View -->
+      <section id="view-session" class="view hidden">
+        <div class="view-header">
+          <h1>Session Capture</h1>
+          <p class="subtitle">Capture all open tabs in one click. Perfect for research sessions.</p>
+        </div>
+        <div class="session-controls">
+          <button id="btn-capture-all" class="btn-primary">📑 Capture All Open Tabs</button>
+          <div id="session-status" class="status hidden"></div>
+        </div>
+        <div class="session-tabs">
+          <h3>Open Tabs</h3>
+          <div id="open-tabs-list" class="tab-list"></div>
+        </div>
+      </section>
+
+      <!-- Auto Capture View -->
+      <section id="view-auto-capture" class="view hidden">
+        <div class="view-header">
+          <h1>Auto Capture</h1>
+          <p class="subtitle">Automatically capture pages based on rules.</p>
+        </div>
+        <div class="auto-capture-controls">
+          <div class="rule-config">
+            <h3>Capture Rules</h3>
+            <div class="rule-row">
+              <label>Domain filter:</label>
+              <input type="text" id="ac-domain" placeholder="e.g., medium.com, docs.google.com">
+            </div>
+            <div class="rule-row">
+              <label>Time threshold (seconds):</label>
+              <input type="text" id="ac-time" placeholder="e.g., 10, 30, 120" value="120">
+              <span class="hint">Capture if you stay on a page this long</span>
+            </div>
+          </div>
+          <div class="auto-capture-actions">
+            <button id="btn-start-ac" class="btn-primary">▶️ Start Auto Capture</button>
+            <button id="btn-stop-ac" class="btn-secondary hidden">⏹️ Stop Auto Capture</button>
+            <div id="ac-status" class="status hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Research View -->
+      <section id="view-research" class="view hidden">
+        <div class="view-header">
+          <h1>📖 Research</h1>
+          <p class="subtitle">Organize sources, generate citations, build bibliographies.</p>
+        </div>
+
+        <div class="research-layout">
+          <!-- Projects Sidebar -->
+          <div class="research-sidebar">
+            <h3>Projects</h3>
+            <div id="research-folders" class="folder-list"></div>
+            <div class="folder-create">
+              <input type="text" id="new-folder-name" placeholder="New project name...">
+              <button id="btn-create-folder" class="btn-primary" style="padding:8px 12px;font-size:12px;">+ Create</button>
+            </div>
+          </div>
+
+          <!-- Research Main Content -->
+          <div class="research-main">
+            <!-- Sub-navigation tabs -->
+            <div class="research-tabs">
+              <button class="research-tab active" data-tab="sources">Sources</button>
+              <button class="research-tab" data-tab="quotes">Quotes</button>
+              <button class="research-tab" data-tab="export">Export</button>
+              <div class="research-style-picker">
+                <select id="research-citation-style">
+                  <option value="apa">APA</option>
+                  <option value="mla">MLA</option>
+                  <option value="harvard">Harvard</option>
+                  <option value="chicago">Chicago</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Sources Tab -->
+            <div id="research-sources" class="research-panel active">
+              <div id="research-sources-list" class="clip-grid"></div>
+              <div id="research-sources-empty" class="empty-state">
+                <p>No sources in this project. Assign clips from the Library or snap new pages.</p>
+              </div>
+            </div>
+
+            <!-- Quotes Tab -->
+            <div id="research-quotes" class="research-panel hidden">
+              <div id="research-quotes-list"></div>
+              <div id="research-quotes-empty" class="empty-state hidden">
+                <p>No quotes tagged yet. Use "Snap Selection" and tag clips as quotes.</p>
+              </div>
+            </div>
+
+            <!-- Export Tab -->
+            <div id="research-export" class="research-panel hidden">
+              <h3>Research Assistant Export</h3>
+              <p class="subtitle">Package your research into an AI-ready markdown file.</p>
+              <div class="export-options">
+                <label>MODE:</label>
+                <div class="preset-buttons">
+                  <button class="research-mode-btn active" data-mode="outline">📋 Outline</button>
+                  <button class="research-mode-btn" data-mode="summarize">📝 Summarize</button>
+                  <button class="research-mode-btn" data-mode="arguments">⚖️ For & Against</button>
+                  <button class="research-mode-btn" data-mode="paraphrase">✏️ Paraphrase</button>
+                  <button class="research-mode-btn" data-mode="introduction">📄 Introduction</button>
+                  <button class="research-mode-btn" data-mode="bibliography">📎 Bibliography Only</button>
+                </div>
+                <button id="btn-research-export" class="btn-primary">💾 Build & Download</button>
+                <div id="research-export-status" class="status hidden"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Clip Detail Modal -->
+      <div id="clip-modal" class="modal hidden">
+        <div class="modal-content">
+          <button id="modal-close" class="modal-close">&times;</button>
+          <div id="modal-body"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

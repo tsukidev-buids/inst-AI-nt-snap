@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inst-AI-nt Snap</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⚡ Inst-AI-nt Snap</h1>
+    </header>
+
+    <div id="view-capture" class="view active">
+      <button id="btn-snap" class="btn-primary">
+        📸 Snap This Page
+      </button>
+      <button id="btn-snap-selection" class="btn-secondary">
+        ✂️ Snap Selection
+      </button>
+
+      <div id="snap-status" class="status hidden"></div>
+
+      <div class="divider"></div>
+
+      <button id="btn-library" class="btn-link">
+        📚 View Library (<span id="clip-count">0</span> clips)
+      </button>
+      <div id="usage-info" class="status" style="background:#1a1a2e;color:#888;font-size:11px;"></div>
+    </div>
+
+    <div id="view-library" class="view">
+      <button id="btn-back" class="btn-link">← Back</button>
+      <h2>Your Clips</h2>
+      <div id="clips-list" class="clips-list"></div>
+      <div id="empty-state" class="empty-state hidden">
+        <p>No clips yet. Snap a page to get started!</p>
+      </div>
+    </div>
+
+    <div id="view-detail" class="view">
+      <button id="btn-back-detail" class="btn-link">← Back to Library</button>
+      <div id="clip-detail"></div>
+    </div>
+
+    <footer>
+      <a href="#" id="btn-dashboard">📊 Open Dashboard</a>
+      &nbsp;·&nbsp;
+      <a href="#" id="btn-settings">⚙️ Settings</a>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

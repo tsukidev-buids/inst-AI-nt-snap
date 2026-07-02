@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inst-AI-nt Snap — Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ Inst-AI-nt Snap Settings</h1>
+
+    <section class="section">
+      <h2>License</h2>
+      <div id="license-status"></div>
+      <div id="license-free" class="hidden">
+        <p class="hint">Free tier: 5 clips/day, 1 prompt build/day, 1 bibliography export/day.</p>
+        <p class="hint">Pro unlocks: unlimited clips, auto-capture, session capture, deep capture, auto-download, AI summarization, full research exports.</p>
+        <label for="license-key">License Key:</label>
+        <input type="text" id="license-key" placeholder="Enter your license key">
+        <button id="btn-activate" class="btn">Activate Pro</button>
+        <button id="btn-buy" class="btn" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;opacity:0.7;cursor:default;">Pro — Coming Soon</button>
+        <p id="license-msg" class="status hidden"></p>
+      </div>
+      <div id="license-pro" class="hidden">
+        <p style="color:#4ade80;font-size:14px;">✅ Pro Active</p>
+        <p class="hint" id="license-email"></p>
+        <button id="btn-deactivate" class="btn btn-danger">Deactivate License</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Storage</h2>
+      <p class="hint">Clips are stored in your browser's local storage. Use export to back them up.</p>
+
+      <div class="pro-feature">
+        <label>
+          <input type="checkbox" id="autoExport">
+          Auto-download on capture <span class="pro-badge">PRO</span>
+        </label>
+      </div>
+
+      <label>
+        <input type="checkbox" id="downloadImages" checked>
+        Include images when downloading
+      </label>
+    </section>
+
+    <section class="section pro-feature">
+      <h2>AI Summarization <span class="pro-badge">PRO</span></h2>
+      <p class="hint">Add an API key to unlock one-click summarization. Without a key, you can still copy clips in AI-ready format.</p>
+
+      <label for="aiProvider">AI Provider:</label>
+      <select id="aiProvider">
+        <option value="">None (export only)</option>
+        <option value="openai">OpenAI</option>
+        <option value="anthropic">Anthropic (Claude)</option>
+        <option value="gemini">Google Gemini</option>
+      </select>
+
+      <div id="ai-settings" class="hidden">
+        <label for="apiKey">API Key:</label>
+        <input type="password" id="apiKey" placeholder="sk-...">
+
+        <label for="model">Model:</label>
+        <input type="text" id="model" placeholder="Auto (provider default)">
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Capture Settings</h2>
+
+      <div class="pro-feature">
+        <label>
+          <input type="checkbox" id="deepCapture">
+          Enable Deep Capture (scroll pages to load all content) <span class="pro-badge">PRO</span>
+        </label>
+        <p class="hint">When enabled, the extension will scroll through pages before capturing to load lazy content. 
+          Use the extension icon badge "⏹️" or press Escape to stop a deep capture in progress. 
+          Warning: some pages scroll infinitely — the capture will auto-stop after 60 seconds.
+          Note: Sites with anti-bot protection (Reddit, Twitter, Instagram) may block deep capture.</p>
+      </div>
+
+      <label>
+        <input type="checkbox" id="suppressLazyWarning">
+        Don't warn me about lazy-loaded pages
+      </label>
+      <p class="hint">When unchecked, you'll be asked to confirm before capturing pages that lazy-load content.</p>
+
+      <label for="maxImages">Max images per clip:</label>
+      <input type="number" id="maxImages" value="20" min="0" max="100">
+
+      <label>
+        <input type="checkbox" id="includeMetadata" checked>
+        Include page metadata (URL, date, title)
+      </label>
+    </section>
+
+    <section class="section">
+      <h2>Data</h2>
+      <button id="btn-export-all" class="btn">Export All Clips</button>
+      <button id="btn-clear-all" class="btn btn-danger">Clear All Clips</button>
+      <p id="data-status" class="status hidden"></p>
+    </section>
+
+    <button id="btn-save" class="btn btn-primary">Save Settings</button>
+    <p id="save-status" class="status hidden"></p>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
