@@ -1,4 +1,7 @@
-document.addEventListener('DOMContentLoaded', loadSettings);
+document.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+  initSnapSelects();
+});
 
 document.getElementById('aiProvider').addEventListener('change', toggleAISettings);
 document.getElementById('btn-save').addEventListener('click', saveSettings);
@@ -6,7 +9,7 @@ document.getElementById('btn-export-all').addEventListener('click', exportAll);
 document.getElementById('btn-clear-all').addEventListener('click', clearAll);
 document.getElementById('btn-activate').addEventListener('click', activateLicense);
 document.getElementById('btn-buy').addEventListener('click', () => {
-  // LemonSqueezy not ready yet
+  chrome.tabs.create({ url: 'https://ko-fi.com/s/97e8a39559' });
 });
 document.getElementById('btn-deactivate').addEventListener('click', deactivateLicenseUI);
 
@@ -99,14 +102,14 @@ async function saveSettings() {
   };
 
   await chrome.storage.local.set({ settings });
-  showSaveStatus('✅ Settings saved!', 'success');
+  showSaveStatus('✓ settings locked in.', 'success');
 }
 
 async function exportAll() {
   const { clips = [] } = await chrome.storage.local.get('clips');
 
   if (clips.length === 0) {
-    showDataStatus('No clips to export.', 'error');
+    showDataStatus('nothing to export. the roll is empty.', 'error');
     return;
   }
 
@@ -119,15 +122,15 @@ async function exportAll() {
   a.click();
   URL.revokeObjectURL(url);
 
-  showDataStatus(`Exported ${clips.length} clips.`, 'success');
+  showDataStatus(`exported ${clips.length} frames.`, 'success');
 }
 
 async function clearAll() {
-  if (!confirm('Delete ALL clips? This cannot be undone.')) return;
-  if (!confirm('Are you sure? All clips will be permanently deleted.')) return;
+  if (!confirm('wipe ALL clips? this can\'t be undone.')) return;
+  if (!confirm('seriously though — all clips, gone forever. you sure?')) return;
 
   await chrome.storage.local.set({ clips: [] });
-  showDataStatus('All clips deleted.', 'success');
+  showDataStatus('film roll wiped clean.', 'success');
 }
 
 function showSaveStatus(message, type) {

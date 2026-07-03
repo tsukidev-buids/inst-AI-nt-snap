@@ -1,0 +1,14 @@
+{
+  "name": "instant-snap-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Test infrastructure for Inst-AI-nt Snap browser extension",
+  "scripts": {
+    "test": "node --test tests/**/*.js",
+    "test:unit": "node --test tests/unit/**/*.js",
+    "test:properties": "node --test tests/properties/**/*.js"
+  },
+  "devDependencies": {
+    "fast-check": "^3.22.0"
+  }
+}

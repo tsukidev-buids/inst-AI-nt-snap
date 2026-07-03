@@ -1,0 +1,7 @@
+.keys-ledger.json
+generated-keys/
+node_modules/
+keygen.js
+keygen-batch.js
+Generate Snap Keys.bat
+build-release.js

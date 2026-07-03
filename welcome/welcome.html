@@ -3,140 +3,272 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Inst-AI-nt Snap</title>
+  <title>Welcome — inst-ai-nt snap</title>
   <style>
+    :root {
+      --snap-bg: #0e0e10;
+      --snap-surface: #18181c;
+      --snap-border: #2a2a30;
+      --snap-text: #f0ece6;
+      --snap-muted: #8a8680;
+      --snap-accent: #f5e6c8;
+      --snap-flash: #fffbe6;
+      --snap-polaroid: #faf8f3;
+      --snap-shadow: rgba(0,0,0,0.5);
+      --font-body: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --grain: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABnRSTlMFCA0REhOKUWzOAAAARElEQVQ4y2NgsGZgYHBiYGBwZmBgsGFgcGEIYQhhSGEIYyhlSGOoZMhmqGGoZ2hk6GDoYuhmGGSYYJhimGVYYFgBAMxQDfkxCa/TAAAAAElFTkSuQmCC");
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0f0f1a;
-      color: #eaeaea;
+      font-family: var(--font-display);
+      background: var(--snap-bg);
+      color: var(--snap-text);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 40px;
+      position: relative;
     }
+
+    /* Film grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: var(--grain);
+      background-repeat: repeat;
+      opacity: 0.04;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Subtle darkroom ambient glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -30%;
+      right: -20%;
+      width: 50%;
+      height: 60%;
+      background: radial-gradient(ellipse, rgba(245,230,200,0.03), transparent 60%);
+      pointer-events: none;
+    }
+
     .welcome {
-      max-width: 600px;
+      max-width: 560px;
       text-align: center;
+      position: relative;
+      z-index: 1;
     }
+
     h1 {
-      font-size: 32px;
+      font-family: var(--font-body);
+      font-size: 24px;
+      font-weight: 700;
       margin-bottom: 8px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--snap-accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 16px rgba(245,230,200,0.3);
+      transform: rotate(-0.4deg);
     }
+
     .subtitle {
-      color: #888;
-      font-size: 15px;
+      font-family: var(--font-body);
+      color: var(--snap-muted);
+      font-size: 12px;
       margin-bottom: 40px;
+      letter-spacing: 0.5px;
     }
+
     .steps {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 14px;
       text-align: left;
       margin-bottom: 40px;
     }
+
     .step {
-      background: #1a1a2e;
-      border: 1px solid #2a2a3e;
-      border-radius: 12px;
+      background: var(--snap-surface);
+      border: 1px solid var(--snap-border);
+      border-radius: 4px;
       padding: 20px;
+      position: relative;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  border-color 0.15s;
     }
+
+    .step:hover {
+      border-color: var(--snap-accent);
+      transform: translateY(-2px) rotate(0.3deg);
+    }
+
+    /* Polaroid bottom edge */
+    .step::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--snap-polaroid);
+      border-radius: 0 0 4px 4px;
+      opacity: 0.4;
+    }
+
     .step-icon {
-      font-size: 24px;
+      font-size: 20px;
       margin-bottom: 8px;
     }
+
     .step h3 {
-      font-size: 14px;
+      font-family: var(--font-body);
+      font-size: 12px;
       margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--snap-accent);
     }
+
     .step p {
       font-size: 12px;
-      color: #999;
+      color: var(--snap-muted);
       line-height: 1.5;
     }
+
     .tip {
-      background: #1a1a2e;
-      border: 1px solid #2a2a3e;
-      border-radius: 12px;
+      background: var(--snap-surface);
+      border: 1px solid var(--snap-border);
+      border-radius: 4px;
       padding: 16px 20px;
       text-align: left;
       margin-bottom: 32px;
-      font-size: 13px;
-      color: #aaa;
-    }
-    .tip strong {
-      color: #eee;
-    }
-    .tip code {
-      background: #2a2a3e;
-      padding: 2px 6px;
-      border-radius: 4px;
       font-size: 12px;
-      color: #667eea;
+      color: var(--snap-muted);
     }
+
+    .tip strong { color: var(--snap-text); }
+
+    .tip code {
+      font-family: var(--font-body);
+      background: var(--snap-bg);
+      border: 1px solid var(--snap-border);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: var(--snap-accent);
+    }
+
     .btn {
       display: inline-block;
       padding: 14px 32px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
+      border-radius: 6px;
+      background: var(--snap-polaroid);
+      color: #111;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
       text-decoration: none;
       cursor: pointer;
       border: none;
-      transition: opacity 0.2s;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 8px var(--snap-shadow);
+      transition: transform 0.08s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.15s;
     }
-    .btn:hover { opacity: 0.9; }
+
+    .btn:hover {
+      transform: scale(0.97) rotate(-0.2deg);
+      box-shadow: 0 4px 16px var(--snap-shadow),
+                  0 0 16px rgba(255,251,230,0.1);
+    }
+
+    .btn:active { transform: scale(0.93); }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, var(--snap-flash), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.08s;
+      pointer-events: none;
+    }
+
+    .btn:active::after { opacity: 0.5; }
+
     .free-info {
       margin-top: 16px;
-      font-size: 12px;
-      color: #666;
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: var(--snap-muted);
+      letter-spacing: 0.3px;
+    }
+
+    /* Film strip decoration at top */
+    .film-strip {
+      width: 100%;
+      height: 10px;
+      margin-bottom: 24px;
+      background-image: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 14px,
+        var(--snap-border) 14px,
+        var(--snap-border) 16px,
+        transparent 16px,
+        transparent 30px
+      );
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
   <div class="welcome">
-    <h1>⚡ Inst-AI-nt Snap</h1>
-    <p class="subtitle">Capture, organize, and export web content for AI.</p>
+    <div class="film-strip"></div>
+    <h1>📷 inst-ai-nt snap</h1>
+    <p class="subtitle">capture, organize, and export web content for AI.</p>
 
     <div class="steps">
       <div class="step">
         <div class="step-icon">📸</div>
-        <h3>Snap</h3>
-        <p>Click the icon or right-click any page to capture text and images instantly.</p>
+        <h3>snap</h3>
+        <p>click the icon or right-click any page to capture text and images instantly.</p>
       </div>
       <div class="step">
-        <div class="step-icon">📚</div>
-        <h3>Organize</h3>
-        <p>Build a research library. Create projects, tag quotes, add notes.</p>
+        <div class="step-icon">🎞️</div>
+        <h3>develop</h3>
+        <p>build a research library. create projects, tag quotes, add notes.</p>
       </div>
       <div class="step">
         <div class="step-icon">📎</div>
-        <h3>Cite</h3>
-        <p>Auto-generated citations in APA, MLA, Harvard, and Chicago formats.</p>
+        <h3>cite</h3>
+        <p>auto-generated citations in APA, MLA, Harvard, and Chicago formats.</p>
       </div>
       <div class="step">
         <div class="step-icon">💾</div>
-        <h3>Export</h3>
-        <p>Download AI-ready prompts with your sources and bibliography included.</p>
+        <h3>export</h3>
+        <p>download AI-ready prompts with your sources and bibliography included.</p>
       </div>
     </div>
 
     <div class="tip">
-      <strong>💡 Tip:</strong> After downloading an export, upload it to any AI (ChatGPT, Gemini, Copilot) and type:<br><br>
+      <strong>💡 developer tip:</strong> after downloading an export, upload it to any AI (ChatGPT, Gemini, Copilot) and type:<br><br>
       <code>Follow the instructions in the attached file.</code>
     </div>
 
-    <p class="free-info">Click the ⚡ Inst-AI-nt Snap icon in your toolbar to get started.</p>
-    <p class="free-info">Free: 5 clips/day · Pro unlocks unlimited clips, auto-capture, and full research exports.</p>
+    <p class="free-info">click the 📷 icon in your toolbar to take your first snap.</p>
+    <p class="free-info">free: 5 snaps/day · pro unlocks unlimited captures, auto-shutter, and full research exports.</p>
+    <div class="film-strip" style="margin-top:24px;margin-bottom:0;"></div>
   </div>
-
-  <script></script>
 </body>
 </html>

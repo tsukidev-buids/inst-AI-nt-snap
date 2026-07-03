@@ -13,6 +13,7 @@ async function init() {
   bindResearch();
   bindModal();
   applyProGating();
+  initSnapSelects();
   document.getElementById('btn-settings').addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });
@@ -357,13 +358,13 @@ function loadPromptClips() {
 
 async function buildAndDownloadPrompt() {
   if (selectedPromptClips.size === 0) {
-    showPromptStatus('Select at least one clip.', 'error');
+    showPromptStatus('pick at least one frame.', 'error');
     return;
   }
 
   const instruction = document.getElementById('prompt-instruction').value.trim();
   if (!instruction) {
-    showPromptStatus('Add an instruction (e.g., compare, summarize).', 'error');
+    showPromptStatus('add an instruction (compare, summarize, etc).', 'error');
     return;
   }
 
@@ -376,7 +377,7 @@ async function buildAndDownloadPrompt() {
 
   const btn = document.getElementById('btn-build-prompt');
   btn.disabled = true;
-  btn.textContent = '⏳ Building...';
+  btn.textContent = 'developing...';
 
   const response = await chrome.runtime.sendMessage({
     action: 'buildPrompt',
@@ -435,16 +436,16 @@ async function buildAndDownloadPrompt() {
     const pasteMsg = 'Follow the instructions in the attached file.';
     try {
       await navigator.clipboard.writeText(pasteMsg);
-      showPromptStatus(`✅ Downloaded! Paste this into your AI: "${pasteMsg}"`, 'success');
+      showPromptStatus(`✓ developed! paste this into your AI: "${pasteMsg}"`, 'success');
     } catch (e) {
-      showPromptStatus(`✅ Downloaded! Type this into your AI: "${pasteMsg}"`, 'success');
+      showPromptStatus(`✓ developed! type this into your AI: "${pasteMsg}"`, 'success');
     }
   } else {
     showPromptStatus('❌ ' + (response.error || 'Failed to build prompt.'), 'error');
   }
 
   btn.disabled = false;
-  btn.textContent = '💾 Build & Download Prompt';
+  btn.textContent = 'develop & download prompt';
 }
 
 function getImageExtension(url) {
@@ -526,23 +527,23 @@ async function captureSession() {
 
   const btn = document.getElementById('btn-capture-all');
   btn.disabled = true;
-  btn.textContent = '⏳ Capturing...';
+  btn.textContent = 'exposing...';
 
   const response = await chrome.runtime.sendMessage({ action: 'captureSession' });
   const status = document.getElementById('session-status');
 
   if (response.success) {
-    status.textContent = `✅ Captured ${response.captured} of ${response.total} tabs. ${response.failed ? `(${response.failed} failed)` : ''}`;
+    status.textContent = `✓ captured ${response.captured} of ${response.total} tabs. ${response.failed ? `(${response.failed} failed)` : ''}`;
     status.className = 'status success';
     await loadLibrary(); // refresh
   } else {
-    status.textContent = '❌ Failed to capture session.';
+    status.textContent = '❌ session burst failed.';
     status.className = 'status error';
   }
 
   status.classList.remove('hidden');
   btn.disabled = false;
-  btn.textContent = '📑 Capture All Open Tabs';
+  btn.textContent = 'burst all open tabs';
 }
 
 // --- Auto Capture ---
@@ -651,10 +652,10 @@ function openClipModal(clipId) {
       </label>
     </div>
     <div class="actions">
-      <button class="btn-ai" data-action="summarize" data-id="${clip.id}">🤖 Summarize</button>
-      <button data-action="copy-md" data-id="${clip.id}">📋 Copy Markdown</button>
-      <button data-action="export" data-id="${clip.id}">💾 Download</button>
-      <button data-action="delete" data-id="${clip.id}">🗑️ Delete</button>
+      <button class="btn-ai" data-action="summarize" data-id="${clip.id}">summarize</button>
+      <button data-action="copy-md" data-id="${clip.id}">copy markdown</button>
+      <button data-action="export" data-id="${clip.id}">download</button>
+      <button data-action="delete" data-id="${clip.id}">delete</button>
     </div>
   `;
 
@@ -697,7 +698,7 @@ async function handleModalAction(e) {
   const id = e.target.dataset.id;
 
   if (action === 'summarize') {
-    e.target.textContent = '⏳...';
+    e.target.textContent = 'thinking...';
     const result = await chrome.runtime.sendMessage({ action: 'summarizeClip', id });
     if (result.success) {
       await loadLibrary();
@@ -712,16 +713,16 @@ async function handleModalAction(e) {
     if (result.success) {
       await navigator.clipboard.writeText(result.content);
       e.target.textContent = '✅ Copied!';
-      setTimeout(() => { e.target.textContent = '📋 Copy Markdown'; }, 2000);
+      setTimeout(() => { e.target.textContent = 'copy markdown'; }, 2000);
     }
   }
 
   if (action === 'export') {
-    e.target.textContent = '⏳ Downloading...';
+    e.target.textContent = 'developing...';
     const result = await chrome.runtime.sendMessage({ action: 'exportClip', id, format: 'markdown-with-images' });
     if (result.success) {
-      e.target.textContent = '✅ Downloaded!';
-      setTimeout(() => { e.target.textContent = '💾 Download'; }, 2000);
+      e.target.textContent = '✓ downloaded!';
+      setTimeout(() => { e.target.textContent = 'download'; }, 2000);
     }
   }
 
@@ -1007,7 +1008,7 @@ async function exportResearch() {
 
   const btn = document.getElementById('btn-research-export');
   btn.disabled = true;
-  btn.textContent = '⏳ Building...';
+  btn.textContent = 'developing...';
 
   const result = await chrome.runtime.sendMessage({
     action: 'buildResearchPrompt',
@@ -1039,7 +1040,7 @@ async function exportResearch() {
   }
 
   btn.disabled = false;
-  btn.textContent = '💾 Build & Download Research Prompt';
+  btn.textContent = 'develop & download';
 }
 
 function showResearchStatus(msg, type) {

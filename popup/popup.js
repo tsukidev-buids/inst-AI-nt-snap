@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', init);
+﻿document.addEventListener('DOMContentLoaded', init);
 
 let currentClips = [];
 
@@ -13,13 +13,13 @@ async function updateUsageInfo() {
   const el = document.getElementById('usage-info');
 
   if (license.isPro) {
-    el.textContent = '⚡ Pro — Unlimited';
-    el.style.color = '#4ade80';
+    el.textContent = 'pro \u2014 unlimited exposures';
+    el.style.color = '#6dd48e';
   } else {
     const usage = await chrome.runtime.sendMessage({ action: 'getUsage' });
     const remaining = 5 - (usage.clips || 0);
-    el.textContent = `Free: ${remaining} clips remaining today`;
-    if (remaining <= 1) el.style.color = '#f87171';
+    el.textContent = `free: ${remaining} snaps left today`;
+    if (remaining <= 1) el.style.color = '#e85d5d';
   }
 }
 
@@ -42,7 +42,7 @@ function bindEvents() {
 async function snapPage() {
   const btn = document.getElementById('btn-snap');
   btn.disabled = true;
-  btn.textContent = '⏳ Checking page...';
+  btn.textContent = 'focusing...';
 
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -59,61 +59,59 @@ async function snapPage() {
 
     // Warn about lazy loading if not suppressed
     if (pageInfo.isLazyLoaded && !settings.suppressLazyWarning && !settings.deepCapture) {
-      btn.textContent = '📸 Snap This Page';
+      btn.textContent = 'snap this page';
       btn.disabled = false;
       showLazyWarning(tab, settings);
       return;
     }
 
-    btn.textContent = settings.deepCapture ? '⏳ Deep capturing...' : '⏳ Capturing...';
+    btn.textContent = settings.deepCapture ? 'deep exposure...' : 'exposing...';
 
-    // For deep capture, we need to keep the popup alive or it will close
-    // Send message and wait for response
     const response = await chrome.tabs.sendMessage(tab.id, {
       action: 'extractContent',
       options: { deepCapture: settings.deepCapture || false }
     });
 
     if (response.error) {
-      showStatus('❌ ' + response.message, 'error');
+      showStatus(response.message, 'error');
       btn.disabled = false;
-      btn.textContent = '📸 Snap This Page';
+      btn.textContent = 'snap this page';
       return;
     }
 
     // Show any warnings
     if (response.warnings && response.warnings.length > 0) {
-      showStatus('⚠️ ' + response.warnings[0], 'error');
+      showStatus(response.warnings[0], 'error');
     }
 
     const result = await chrome.runtime.sendMessage({ action: 'saveClip', data: response });
 
     if (result.success) {
-      showStatus('✅ Snapped! Saved to library.', 'success');
+      showStatus('snapped. added to the roll.', 'success');
       await updateClipCount();
       await updateUsageInfo();
     } else if (result.limitReached) {
-      showStatus('🔒 ' + result.error, 'error');
+      showStatus(result.error, 'error');
     } else {
-      showStatus('❌ ' + (result.error || 'Failed to save'), 'error');
+      showStatus(result.error || 'failed to save', 'error');
     }
   } catch (err) {
-    showStatus('❌ Could not capture page. Try refreshing.', 'error');
+    showStatus('could not capture page. try refreshing.', 'error');
     console.error(err);
   }
 
   btn.disabled = false;
-  btn.textContent = '📸 Snap This Page';
+  btn.textContent = 'snap this page';
 }
 
 function showLazyWarning(tab, settings) {
   const statusEl = document.getElementById('snap-status');
   statusEl.innerHTML = `
     <div style="text-align:left;font-size:12px;">
-      ⚠️ This page lazy-loads content. Capture may be partial.<br><br>
-      <button id="lazy-proceed" style="margin-right:6px;padding:4px 10px;border-radius:6px;border:none;background:#667eea;color:#fff;cursor:pointer;">Capture Anyway</button>
-      <button id="lazy-cancel" style="padding:4px 10px;border-radius:6px;border:1px solid #444;background:#2a2a3e;color:#ccc;cursor:pointer;">Cancel</button>
-      <br><label style="margin-top:8px;display:block;"><input type="checkbox" id="lazy-dontask"> Don't ask again</label>
+      this page lazy-loads content. capture may be partial.<br><br>
+      <button id="lazy-proceed" style="margin-right:6px;padding:4px 10px;border-radius:6px;border:none;background:var(--snap-polaroid);color:#111;cursor:pointer;font-weight:600;">capture anyway</button>
+      <button id="lazy-cancel" style="padding:4px 10px;border-radius:6px;border:1px solid var(--snap-border);background:var(--snap-surface);color:var(--snap-muted);cursor:pointer;">cancel</button>
+      <br><label style="margin-top:8px;display:block;"><input type="checkbox" id="lazy-dontask"> don't ask again</label>
     </div>
   `;
   statusEl.className = 'status error';
@@ -126,10 +124,9 @@ function showLazyWarning(tab, settings) {
       await chrome.storage.local.set({ settings });
     }
     statusEl.classList.add('hidden');
-    // Proceed with capture
     const btn = document.getElementById('btn-snap');
     btn.disabled = true;
-    btn.textContent = '⏳ Capturing...';
+    btn.textContent = 'exposing...';
 
     const response = await chrome.tabs.sendMessage(tab.id, {
       action: 'extractContent',
@@ -139,15 +136,15 @@ function showLazyWarning(tab, settings) {
     if (!response.error) {
       const result = await chrome.runtime.sendMessage({ action: 'saveClip', data: response });
       if (result.success) {
-        showStatus('✅ Snapped! Saved to library.', 'success');
+        showStatus('snapped. added to the roll.', 'success');
         await updateClipCount();
         await updateUsageInfo();
       } else if (result.limitReached) {
-        showStatus('🔒 ' + result.error, 'error');
+        showStatus(result.error, 'error');
       }
     }
     btn.disabled = false;
-    btn.textContent = '📸 Snap This Page';
+    btn.textContent = 'snap this page';
   });
 
   document.getElementById('lazy-cancel').addEventListener('click', () => {
@@ -168,7 +165,7 @@ async function snapSelection() {
     });
 
     if (!result || result.trim().length === 0) {
-      showStatus('⚠️ No text selected on the page.', 'error');
+      showStatus('no text selected on the page.', 'error');
       btn.disabled = false;
       return;
     }
@@ -184,13 +181,13 @@ async function snapSelection() {
     const saveResult = await chrome.runtime.sendMessage({ action: 'saveClip', data });
 
     if (saveResult.success) {
-      showStatus('✅ Selection saved!', 'success');
+      showStatus('selection captured.', 'success');
       await updateClipCount();
     } else {
-      showStatus('❌ ' + (saveResult.error || 'Failed to save'), 'error');
+      showStatus(saveResult.error || 'failed to save', 'error');
     }
   } catch (err) {
-    showStatus('❌ Could not capture selection.', 'error');
+    showStatus('could not capture selection.', 'error');
     console.error(err);
   }
 
@@ -218,15 +215,15 @@ function showDetail(clipId) {
   detail.innerHTML = `
     <h3>${escapeHtml(clip.title)}</h3>
     <div class="meta">
-      ${new Date(clip.createdAt).toLocaleString()} · ${clip.images.length} images
+      ${new Date(clip.createdAt).toLocaleString()} \u00b7 ${clip.images.length} images
     </div>
-    ${clip.summary ? `<div class="text-preview"><strong>Summary:</strong><br>${escapeHtml(clip.summary)}</div>` : ''}
+    ${clip.summary ? `<div class="text-preview"><strong>summary:</strong><br>${escapeHtml(clip.summary)}</div>` : ''}
     <div class="text-preview">${escapeHtml(clip.text.slice(0, 500))}${clip.text.length > 500 ? '...' : ''}</div>
     <div class="actions">
-      <button class="btn-ai" data-action="summarize" data-id="${clip.id}">🤖 Summarize</button>
-      <button data-action="copy-md" data-id="${clip.id}">📋 Copy as Markdown</button>
-      <button data-action="export" data-id="${clip.id}">💾 Download</button>
-      <button data-action="delete" data-id="${clip.id}">🗑️ Delete</button>
+      <button class="btn-ai" data-action="summarize" data-id="${clip.id}">summarize</button>
+      <button data-action="copy-md" data-id="${clip.id}">copy markdown</button>
+      <button data-action="export" data-id="${clip.id}">download</button>
+      <button data-action="delete" data-id="${clip.id}">delete</button>
     </div>
   `;
 
@@ -240,14 +237,14 @@ async function handleDetailAction(e) {
   const id = e.target.dataset.id;
 
   if (action === 'summarize') {
-    e.target.textContent = '⏳ Summarizing...';
+    e.target.textContent = 'thinking...';
     const result = await chrome.runtime.sendMessage({ action: 'summarizeClip', id });
     if (result.success) {
-      showDetail(id); // refresh view
-      showStatus('✅ Summary generated!', 'success');
+      showDetail(id);
+      showStatus('summary generated.', 'success');
     } else {
-      showStatus('❌ ' + result.error, 'error');
-      e.target.textContent = '🤖 Summarize';
+      showStatus(result.error, 'error');
+      e.target.textContent = 'summarize';
     }
   }
 
@@ -255,21 +252,21 @@ async function handleDetailAction(e) {
     const result = await chrome.runtime.sendMessage({ action: 'exportClip', id, format: 'markdown' });
     if (result.success) {
       await navigator.clipboard.writeText(result.content);
-      showStatus('📋 Copied to clipboard!', 'success');
+      showStatus('copied.', 'success');
     }
   }
 
   if (action === 'export') {
-    e.target.textContent = '⏳ Downloading...';
+    e.target.textContent = 'developing...';
     const result = await chrome.runtime.sendMessage({ action: 'exportClip', id, format: 'markdown-with-images' });
     if (result.success) {
-      e.target.textContent = '✅ Done!';
-      setTimeout(() => { e.target.textContent = '💾 Download'; }, 2000);
+      e.target.textContent = 'done.';
+      setTimeout(() => { e.target.textContent = 'download'; }, 2000);
     }
   }
 
   if (action === 'delete') {
-    if (confirm('Delete this clip?')) {
+    if (confirm('delete this clip?')) {
       await chrome.runtime.sendMessage({ action: 'deleteClip', id });
       await updateClipCount();
       showLibrary();
@@ -292,8 +289,8 @@ function renderClips() {
     <div class="clip-item" data-id="${clip.id}">
       <div class="clip-item-title">${escapeHtml(clip.title)}</div>
       <div class="clip-item-meta">
-        ${new Date(clip.createdAt).toLocaleDateString()} · ${clip.text.length} chars · ${clip.images.length} imgs
-        ${clip.summary ? ' · 🤖 summarized' : ''}
+        ${new Date(clip.createdAt).toLocaleDateString()} \u00b7 ${clip.text.length} chars \u00b7 ${clip.images.length} imgs
+        ${clip.summary ? ' \u00b7 summarized' : ''}
       </div>
     </div>
   `).join('');

@@ -1,6 +1,6 @@
-# Privacy Policy — Inst-AI-nt Snap
+- Privacy Policy — Inst-AI-nt Snap
 
-**Last updated:** July 2, 2026
+**Last updated:** July 3, 2026
 
 ## Summary
 
@@ -24,7 +24,7 @@ All clips, settings, research projects, and usage data are stored locally in you
 The extension connects to external services ONLY when you explicitly configure them:
 
 - **AI Summarization (optional):** If you add an API key for OpenAI, Anthropic, or Google Gemini, your clip text is sent to that provider's API for summarization. This is initiated by you, uses your own API key, and is subject to that provider's privacy policy.
-- **License Validation (optional):** If you activate a Pro license key, the key is validated with LemonSqueezy's API. Only the license key is sent — no personal data, clip content, or browsing information.
+- **License Validation (optional):** If you activate a Pro license key, the key is validated locally on your device. No server calls are made for license checks. Your purchase is handled through Ko-fi's platform, subject to their privacy policy.
 
 ## Permissions Explained
 

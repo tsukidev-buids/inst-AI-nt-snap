@@ -12,7 +12,13 @@ Capture any web page's content instantly. Store it locally, export in AI-ready f
 - **Library** — browse, search, and manage all your clips
 - **Download** — export clips as markdown files
 
-## Installation (Development)
+## Installation
+
+- **Microsoft Edge:** [Install from Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/instaint-snap/mcklnjgpbjfibfjjfkgolijfjadcinff)
+- **Google Chrome:** Coming soon
+- **Opera:** Coming soon
+
+### Development
 
 1. Open Chrome and go to `chrome://extensions/`
 2. Enable "Developer mode" (top right)

@@ -3,23 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inst-AI-nt Snap — Settings</title>
+  <title>inst-ai-nt snap — settings</title>
   <link rel="stylesheet" href="options.css">
+  <link rel="stylesheet" href="../tutorial/tutorial.css">
 </head>
 <body>
   <div class="container">
-    <h1>⚡ Inst-AI-nt Snap Settings</h1>
+    <h1>📷 inst-ai-nt snap settings</h1>
 
     <section class="section">
       <h2>License</h2>
       <div id="license-status"></div>
       <div id="license-free" class="hidden">
-        <p class="hint">Free tier: 5 clips/day, 1 prompt build/day, 1 bibliography export/day.</p>
-        <p class="hint">Pro unlocks: unlimited clips, auto-capture, session capture, deep capture, auto-download, AI summarization, full research exports.</p>
+        <p class="hint">free tier: 5 snaps/day, 1 prompt build/day, 1 bibliography export/day.</p>
+        <p class="hint">pro unlocks: unlimited snaps, auto-shutter, session burst, deep capture, auto-download, AI summarization, full research exports.</p>
         <label for="license-key">License Key:</label>
         <input type="text" id="license-key" placeholder="Enter your license key">
-        <button id="btn-activate" class="btn">Activate Pro</button>
-        <button id="btn-buy" class="btn" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;opacity:0.7;cursor:default;">Pro — Coming Soon</button>
+        <button id="btn-activate" class="btn">activate pro</button>
+        <button id="btn-buy" class="btn" style="background:var(--snap-polaroid);color:#111;border:none;font-weight:700;cursor:pointer;">grab pro on ko-fi</button>
         <p id="license-msg" class="status hidden"></p>
       </div>
       <div id="license-pro" class="hidden">
@@ -31,7 +32,7 @@
 
     <section class="section">
       <h2>Storage</h2>
-      <p class="hint">Clips are stored in your browser's local storage. Use export to back them up.</p>
+      <p class="hint">clips are stored locally in your browser. use export to back them up before they fade.</p>
 
       <div class="pro-feature">
         <label>
@@ -48,7 +49,7 @@
 
     <section class="section pro-feature">
       <h2>AI Summarization <span class="pro-badge">PRO</span></h2>
-      <p class="hint">Add an API key to unlock one-click summarization. Without a key, you can still copy clips in AI-ready format.</p>
+      <p class="hint">add an API key to unlock one-click summarization. without a key, you can still export clips in AI-ready format.</p>
 
       <label for="aiProvider">AI Provider:</label>
       <select id="aiProvider">
@@ -98,15 +99,18 @@
 
     <section class="section">
       <h2>Data</h2>
-      <button id="btn-export-all" class="btn">Export All Clips</button>
-      <button id="btn-clear-all" class="btn btn-danger">Clear All Clips</button>
+      <button id="btn-export-all" class="btn">export all clips</button>
+      <button id="btn-clear-all" class="btn btn-danger">wipe everything</button>
       <p id="data-status" class="status hidden"></p>
     </section>
 
-    <button id="btn-save" class="btn btn-primary">Save Settings</button>
+    <button id="btn-save" class="btn btn-primary">save settings</button>
     <p id="save-status" class="status hidden"></p>
   </div>
 
+  <script src="../tutorial/snap-select.js"></script>
+  <script src="../tutorial/tutorial.js"></script>
   <script src="options.js"></script>
+  <script src="options-tutorial.js"></script>
 </body>
 </html>

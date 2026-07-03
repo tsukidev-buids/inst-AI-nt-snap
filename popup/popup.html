@@ -5,19 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inst-AI-nt Snap</title>
   <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="../tutorial/tutorial.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>⚡ Inst-AI-nt Snap</h1>
+      <h1>📷 inst-ai-nt snap</h1>
     </header>
 
     <div id="view-capture" class="view active">
       <button id="btn-snap" class="btn-primary">
-        📸 Snap This Page
+        snap this page
       </button>
       <button id="btn-snap-selection" class="btn-secondary">
-        ✂️ Snap Selection
+        ✂️ snap selection
       </button>
 
       <div id="snap-status" class="status hidden"></div>
@@ -25,32 +26,34 @@
       <div class="divider"></div>
 
       <button id="btn-library" class="btn-link">
-        📚 View Library (<span id="clip-count">0</span> clips)
+        film roll · <span id="clip-count">0</span> clips
       </button>
-      <div id="usage-info" class="status" style="background:#1a1a2e;color:#888;font-size:11px;"></div>
+      <div id="usage-info" class="status" style="background:var(--snap-surface);color:var(--snap-muted);font-size:10px;border:1px solid var(--snap-border);"></div>
     </div>
 
     <div id="view-library" class="view">
-      <button id="btn-back" class="btn-link">← Back</button>
-      <h2>Your Clips</h2>
+      <button id="btn-back" class="btn-link">← back</button>
+      <h2 style="font-size:14px;color:var(--snap-accent);font-family:var(--font-body);letter-spacing:0.5px;">your clips</h2>
       <div id="clips-list" class="clips-list"></div>
       <div id="empty-state" class="empty-state hidden">
-        <p>No clips yet. Snap a page to get started!</p>
+        <p>nothing developed yet. snap a page to expose some frames.</p>
       </div>
     </div>
 
     <div id="view-detail" class="view">
-      <button id="btn-back-detail" class="btn-link">← Back to Library</button>
+      <button id="btn-back-detail" class="btn-link">← back to roll</button>
       <div id="clip-detail"></div>
     </div>
 
     <footer>
-      <a href="#" id="btn-dashboard">📊 Open Dashboard</a>
+      <a href="#" id="btn-dashboard">darkroom</a>
       &nbsp;·&nbsp;
-      <a href="#" id="btn-settings">⚙️ Settings</a>
+      <a href="#" id="btn-settings">settings</a>
     </footer>
   </div>
 
+  <script src="../tutorial/tutorial.js"></script>
   <script src="popup.js"></script>
+  <script src="popup-tutorial.js"></script>
 </body>
 </html>

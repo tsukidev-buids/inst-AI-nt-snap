@@ -1,13 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea"/>
-      <stop offset="100%" style="stop-color:#764ba2"/>
-    </linearGradient>
-  </defs>
-  <rect x="8" y="8" width="112" height="112" rx="24" fill="url(#grad)"/>
-  <!-- Lightning bolt -->
-  <path d="M72 20L44 68h18L52 108l32-52H66l6-36z" fill="#fff" fill-opacity="0.95"/>
-  <!-- Camera lens circle -->
-  <circle cx="64" cy="64" r="28" fill="none" stroke="#fff" stroke-width="3" stroke-opacity="0.3"/>
+  <!-- Background: dark rounded square -->
+  <rect x="4" y="4" width="120" height="120" rx="20" fill="#18181c"/>
+  <rect x="4" y="4" width="120" height="120" rx="20" fill="none" stroke="#2a2a30" stroke-width="2"/>
+  
+  <!-- Polaroid frame — slight tilt -->
+  <g transform="rotate(-2, 64, 64)">
+    <rect x="28" y="22" width="72" height="88" rx="3" fill="#faf8f3"/>
+    
+    <!-- Photo area (dark exposure) -->
+    <rect x="34" y="28" width="60" height="60" rx="2" fill="#1b1b1f"/>
+    
+    <!-- Aperture iris — 6 straight geometric blades -->
+    <g transform="translate(64, 55)" fill="#f5e6c8" opacity="0.8">
+      <polygon points="0,-6 5,-15 11,-11"/>
+      <polygon points="5.2,3 14.5,-3.5 13,4"/>
+      <polygon points="5.2,3 9.5,13 3,11"/>
+      <polygon points="0,6 -5,15 -11,11"/>
+      <polygon points="-5.2,-3 -14.5,3.5 -13,-4"/>
+      <polygon points="-5.2,-3 -9.5,-13 -3,-11"/>
+    </g>
+    
+    <!-- Outer lens ring -->
+    <circle cx="64" cy="55" r="18" fill="none" stroke="#f5e6c8" stroke-width="2.5" opacity="0.65"/>
+    
+    <!-- Center dot -->
+    <circle cx="64" cy="55" r="3.5" fill="#f5e6c8" opacity="0.7"/>
+  </g>
+  
+  <!-- Lightning bolt — solid, top-right -->
+  <g transform="translate(94, 10)">
+    <polygon points="5,0 0,9 4,9 -1,20 9,8 5,8 9,0" fill="#f5e6c8" opacity="0.95"/>
+  </g>
 </svg>

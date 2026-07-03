@@ -3,23 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inst-AI-nt Snap — Dashboard</title>
+  <title>inst-ai-nt snap — darkroom</title>
   <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="../tutorial/tutorial.css">
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="logo">⚡ Inst-AI-nt Snap</div>
+      <div class="logo">📷 inst-ai-nt snap</div>
       <nav>
-        <button class="nav-btn active" data-view="library">📚 Library</button>
-        <button class="nav-btn" data-view="search">🔍 Search</button>
-        <button class="nav-btn" data-view="prompt-builder">🤖 Prompt Builder</button>
-        <button class="nav-btn" data-view="session">📑 Session Capture</button>
-        <button class="nav-btn" data-view="auto-capture">⚡ Auto Capture</button>
-        <button class="nav-btn" data-view="research">📖 Research</button>
+        <button class="nav-btn active" data-view="library">film roll</button>
+        <button class="nav-btn" data-view="search">search negatives</button>
+        <button class="nav-btn" data-view="prompt-builder">prompt lab</button>
+        <div class="nav-divider"></div>
+        <button class="nav-btn" data-view="session">session burst</button>
+        <button class="nav-btn" data-view="auto-capture">auto-shutter</button>
+        <button class="nav-btn" data-view="research">research desk</button>
       </nav>
       <div class="sidebar-footer">
-        <button id="btn-settings" class="nav-btn">⚙️ Settings</button>
+        <button id="btn-settings" class="nav-btn">settings</button>
       </div>
     </aside>
 
@@ -27,7 +29,7 @@
       <!-- Library View -->
       <section id="view-library" class="view active">
         <div class="view-header">
-          <h1>Your Library</h1>
+          <h1>Film Roll</h1>
           <span id="total-clips" class="badge">0 clips</span>
           <span id="storage-used" class="badge">0 KB</span>
         </div>
@@ -45,30 +47,30 @@
         </div>
         <div id="library-list" class="clip-grid"></div>
         <div id="library-empty" class="empty-state hidden">
-          <p>No clips yet. Snap a page to get started!</p>
+          <p>no exposures yet. snap a page to develop your first frame.</p>
         </div>
       </section>
 
       <!-- Search View -->
       <section id="view-search" class="view hidden">
         <div class="view-header">
-          <h1>Search</h1>
+          <h1>Search Negatives</h1>
         </div>
         <div class="search-bar">
-          <input type="text" id="search-input" placeholder="Search across all clips..." autofocus>
-          <button id="btn-search" class="btn-primary">Search</button>
+          <input type="text" id="search-input" placeholder="dig through your negatives..." autofocus>
+          <button id="btn-search" class="btn-primary">find</button>
         </div>
         <div id="search-results" class="clip-grid"></div>
         <div id="search-empty" class="empty-state hidden">
-          <p>No results found.</p>
+          <p>nothing in the archive matches that.</p>
         </div>
       </section>
 
       <!-- Prompt Builder View -->
       <section id="view-prompt-builder" class="view hidden">
         <div class="view-header">
-          <h1>AI Prompt Builder</h1>
-          <p class="subtitle">Select clips and combine them into one AI-ready prompt.</p>
+          <h1>Prompt Lab</h1>
+          <p class="subtitle">select frames and compose them into one AI-ready exposure.</p>
         </div>
         <div class="prompt-builder-layout">
           <div class="clip-selector">
@@ -88,7 +90,7 @@
               <button class="preset-btn" data-instruction="explain">💡 Explain</button>
             </div>
             <textarea id="prompt-instruction" placeholder="Or write your own instruction..."></textarea>
-            <button id="btn-build-prompt" class="btn-primary">💾 Build & Download Prompt</button>
+            <button id="btn-build-prompt" class="btn-primary">develop & download prompt</button>
             <div id="prompt-status" class="status hidden"></div>
           </div>
         </div>
@@ -97,15 +99,15 @@
       <!-- Session Capture View -->
       <section id="view-session" class="view hidden">
         <div class="view-header">
-          <h1>Session Capture</h1>
-          <p class="subtitle">Capture all open tabs in one click. Perfect for research sessions.</p>
+          <h1>Session Burst</h1>
+          <p class="subtitle">capture all open tabs in one shutter click. perfect for research binges.</p>
         </div>
         <div class="session-controls">
-          <button id="btn-capture-all" class="btn-primary">📑 Capture All Open Tabs</button>
+          <button id="btn-capture-all" class="btn-primary">burst all open tabs</button>
           <div id="session-status" class="status hidden"></div>
         </div>
         <div class="session-tabs">
-          <h3>Open Tabs</h3>
+          <h3 style="font-family:var(--font-body);font-size:12px;color:var(--snap-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">open tabs</h3>
           <div id="open-tabs-list" class="tab-list"></div>
         </div>
       </section>
@@ -113,8 +115,8 @@
       <!-- Auto Capture View -->
       <section id="view-auto-capture" class="view hidden">
         <div class="view-header">
-          <h1>Auto Capture</h1>
-          <p class="subtitle">Automatically capture pages based on rules.</p>
+          <h1>Auto-Shutter</h1>
+          <p class="subtitle">set it and forget it. we'll snap pages based on your rules.</p>
         </div>
         <div class="auto-capture-controls">
           <div class="rule-config">
@@ -130,8 +132,8 @@
             </div>
           </div>
           <div class="auto-capture-actions">
-            <button id="btn-start-ac" class="btn-primary">▶️ Start Auto Capture</button>
-            <button id="btn-stop-ac" class="btn-secondary hidden">⏹️ Stop Auto Capture</button>
+            <button id="btn-start-ac" class="btn-primary">start auto-shutter</button>
+            <button id="btn-stop-ac" class="btn-secondary hidden">stop</button>
             <div id="ac-status" class="status hidden"></div>
           </div>
         </div>
@@ -140,8 +142,8 @@
       <!-- Research View -->
       <section id="view-research" class="view hidden">
         <div class="view-header">
-          <h1>📖 Research</h1>
-          <p class="subtitle">Organize sources, generate citations, build bibliographies.</p>
+          <h1>Research Desk</h1>
+          <p class="subtitle">organize sources, generate citations, build bibliographies.</p>
         </div>
 
         <div class="research-layout">
@@ -176,7 +178,7 @@
             <div id="research-sources" class="research-panel active">
               <div id="research-sources-list" class="clip-grid"></div>
               <div id="research-sources-empty" class="empty-state">
-                <p>No sources in this project. Assign clips from the Library or snap new pages.</p>
+                <p>no sources in this project. assign clips from the film roll or snap new pages.</p>
               </div>
             </div>
 
@@ -184,14 +186,14 @@
             <div id="research-quotes" class="research-panel hidden">
               <div id="research-quotes-list"></div>
               <div id="research-quotes-empty" class="empty-state hidden">
-                <p>No quotes tagged yet. Use "Snap Selection" and tag clips as quotes.</p>
+                <p>no quotes tagged yet. use "snap selection" and tag clips as quotes.</p>
               </div>
             </div>
 
             <!-- Export Tab -->
             <div id="research-export" class="research-panel hidden">
-              <h3>Research Assistant Export</h3>
-              <p class="subtitle">Package your research into an AI-ready markdown file.</p>
+              <h3>Research Export</h3>
+              <p class="subtitle">package your research into an AI-ready file for the darkroom.</p>
               <div class="export-options">
                 <label>MODE:</label>
                 <div class="preset-buttons">
@@ -202,7 +204,7 @@
                   <button class="research-mode-btn" data-mode="introduction">📄 Introduction</button>
                   <button class="research-mode-btn" data-mode="bibliography">📎 Bibliography Only</button>
                 </div>
-                <button id="btn-research-export" class="btn-primary">💾 Build & Download</button>
+                <button id="btn-research-export" class="btn-primary">develop & download</button>
                 <div id="research-export-status" class="status hidden"></div>
               </div>
             </div>
@@ -220,6 +222,9 @@
     </main>
   </div>
 
+  <script src="../tutorial/snap-select.js"></script>
+  <script src="../tutorial/tutorial.js"></script>
   <script src="dashboard.js"></script>
+  <script src="dashboard-tutorial.js"></script>
 </body>
 </html>

@@ -1,62 +1,59 @@
 <!DOCTYPE html>
 <html>
-<head><title>Inst-AI-nt Snap — Icon Generator</title></head>
-<body>
-<p>Open this file in a browser and right-click each canvas to "Save image as..." for the PNGs.</p>
+<head><title>inst-ai-nt snap — icon generator</title></head>
+<body style="background:#111;color:#eee;font-family:monospace;padding:40px;">
+<p>open in browser, right-click each canvas → "save image as" for the PNGs.</p>
 <p>16x16:</p><canvas id="c16" width="16" height="16"></canvas>
 <p>48x48:</p><canvas id="c48" width="48" height="48"></canvas>
+<p>64x64:</p><canvas id="c64" width="64" height="64"></canvas>
 <p>128x128:</p><canvas id="c128" width="128" height="128"></canvas>
+<p>512x512 (ko-fi / marketing):</p><canvas id="c512" width="512" height="512"></canvas>
+
 <script>
-function drawIcon(canvas) {
+const svgSource = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect x="4" y="4" width="120" height="120" rx="20" fill="#18181c"/>
+  <rect x="4" y="4" width="120" height="120" rx="20" fill="none" stroke="#2a2a30" stroke-width="2"/>
+  <g transform="rotate(-2, 64, 64)">
+    <rect x="28" y="22" width="72" height="88" rx="3" fill="#faf8f3"/>
+    <rect x="34" y="28" width="60" height="60" rx="2" fill="#1b1b1f"/>
+    <g transform="translate(64, 55)" fill="#f5e6c8" opacity="0.8">
+      <polygon points="0,-6 5,-15 11,-11"/>
+      <polygon points="5.2,3 14.5,-3.5 13,4"/>
+      <polygon points="5.2,3 9.5,13 3,11"/>
+      <polygon points="0,6 -5,15 -11,11"/>
+      <polygon points="-5.2,-3 -14.5,3.5 -13,-4"/>
+      <polygon points="-5.2,-3 -9.5,-13 -3,-11"/>
+    </g>
+    <circle cx="64" cy="55" r="18" fill="none" stroke="#f5e6c8" stroke-width="2.5" opacity="0.65"/>
+    <circle cx="64" cy="55" r="3.5" fill="#f5e6c8" opacity="0.7"/>
+  </g>
+  <g transform="translate(94, 10)">
+    <polygon points="5,0 0,9 4,9 -1,20 9,8 5,8 9,0" fill="#f5e6c8" opacity="0.95"/>
+  </g>
+</svg>`;
+
+function renderToCanvas(canvasId) {
+  const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext('2d');
-  const s = canvas.width;
-  const r = s * 0.1875; // corner radius
+  const size = canvas.width;
 
-  // Rounded rectangle background with gradient
-  const grad = ctx.createLinearGradient(0, 0, s, s);
-  grad.addColorStop(0, '#667eea');
-  grad.addColorStop(1, '#764ba2');
+  const img = new Image();
+  const blob = new Blob([svgSource], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
 
-  ctx.beginPath();
-  ctx.moveTo(r, 0);
-  ctx.lineTo(s - r, 0);
-  ctx.quadraticCurveTo(s, 0, s, r);
-  ctx.lineTo(s, s - r);
-  ctx.quadraticCurveTo(s, s, s - r, s);
-  ctx.lineTo(r, s);
-  ctx.quadraticCurveTo(0, s, 0, s - r);
-  ctx.lineTo(0, r);
-  ctx.quadraticCurveTo(0, 0, r, 0);
-  ctx.closePath();
-  ctx.fillStyle = grad;
-  ctx.fill();
-
-  // Lightning bolt
-  ctx.beginPath();
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-  const lx = s * 0.5625; // 72/128
-  const ly = s * 0.15625; // 20/128
-  ctx.moveTo(lx, ly);
-  ctx.lineTo(s * 0.34375, s * 0.53125); // 44, 68
-  ctx.lineTo(s * 0.484375, s * 0.53125); // 62, 68
-  ctx.lineTo(s * 0.40625, s * 0.84375); // 52, 108
-  ctx.lineTo(s * 0.65625, s * 0.4375); // 84, 56
-  ctx.lineTo(s * 0.515625, s * 0.4375); // 66, 56
-  ctx.lineTo(s * 0.5625, s * 0.15625); // 72, 20
-  ctx.closePath();
-  ctx.fill();
-
-  // Subtle camera lens circle
-  ctx.beginPath();
-  ctx.arc(s / 2, s / 2, s * 0.21875, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-  ctx.lineWidth = Math.max(1, s * 0.023);
-  ctx.stroke();
+  img.onload = () => {
+    ctx.clearRect(0, 0, size, size);
+    ctx.drawImage(img, 0, 0, size, size);
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
 }
 
-drawIcon(document.getElementById('c16'));
-drawIcon(document.getElementById('c48'));
-drawIcon(document.getElementById('c128'));
+renderToCanvas('c16');
+renderToCanvas('c48');
+renderToCanvas('c64');
+renderToCanvas('c128');
+renderToCanvas('c512');
 </script>
 </body>
 </html>
