@@ -107,3 +107,44 @@ export function createLicenseDeps(overrides = {}) {
     ...overrides
   };
 }
+
+/**
+ * Generates a valid SNAP license key for testing purposes.
+ * This lives here (not in the production module) so key generation
+ * logic isn't shipped in the tracked extension source.
+ */
+export function generateTestKey(cryptoImpl) {
+  const crypto = cryptoImpl || createMockCrypto();
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+  function computeChecksum(payload) {
+    let hash = 0;
+    for (let i = 0; i < payload.length; i++) {
+      const char = payload.charCodeAt(i);
+      hash = ((hash << 5) - hash + char) | 0;
+    }
+    let result = '';
+    let n = Math.abs(hash);
+    for (let i = 0; i < 4; i++) {
+      result += chars[n % chars.length];
+      n = Math.floor(n / chars.length);
+    }
+    return result;
+  }
+
+  const randomGroup = () => {
+    let group = '';
+    const bytes = new Uint8Array(4);
+    crypto.getRandomValues(bytes);
+    for (let i = 0; i < 4; i++) {
+      group += chars[bytes[i] % chars.length];
+    }
+    return group;
+  };
+
+  const g1 = randomGroup();
+  const g2 = randomGroup();
+  const g3 = randomGroup();
+  const checksum = computeChecksum(g1 + g2 + g3);
+  return `SNAP-${g1}-${g2}-${g3}-${checksum}`;
+}

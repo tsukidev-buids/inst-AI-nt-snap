@@ -4,6 +4,31 @@
 importScripts('license.js');
 importScripts('citations.js');
 
+// Apply extension update when available (reload service worker cleanly)
+chrome.runtime.onUpdateAvailable.addListener(() => {
+  // Stop auto-capture before reloading to avoid orphaned state
+  chrome.storage.local.get('autoCaptureState').then(({ autoCaptureState }) => {
+    if (autoCaptureState && autoCaptureState.active) {
+      chrome.storage.local.set({
+        autoCaptureState: { ...autoCaptureState, active: false }
+      });
+    }
+  });
+  chrome.runtime.reload();
+});
+
+// Stop auto-capture on browser restart (cold start = fresh session)
+chrome.runtime.onStartup.addListener(() => {
+  chrome.storage.local.get('autoCaptureState').then(({ autoCaptureState }) => {
+    if (autoCaptureState && autoCaptureState.active) {
+      chrome.storage.local.set({
+        autoCaptureState: { active: false, rules: autoCaptureState.rules || [], capturedUrls: [] }
+      });
+      chrome.storage.local.remove('autoCaptureTimeTracks');
+    }
+  });
+});
+
 // Context menu for selection-based capture
 chrome.runtime.onInstalled.addListener((details) => {
   chrome.contextMenus.create({
@@ -23,6 +48,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 
   // Show welcome page on first install
   if (details.reason === 'install') {
+    chrome.storage.local.set({ installed_at: Date.now() });
     chrome.tabs.create({ url: chrome.runtime.getURL('welcome/welcome.html') });
   }
 });
@@ -100,9 +126,12 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (info.menuItemId === 'snap-page') {
     try {
+      const { settings = {} } = await chrome.storage.local.get('settings');
+      const maxImages = settings.maxImages || 20;
       const [{ result: pageData }] = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        func: extractPageFromContext
+        func: extractPageFromContext,
+        args: [maxImages]
       });
       const result = await saveClip(pageData);
       if (result.success) {
@@ -128,8 +157,43 @@ function showBadge(text, color) {
   setTimeout(() => chrome.action.setBadgeText({ text: '' }), 2000);
 }
 
+// Keyboard shortcut handler
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command === 'snap-page') {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab || !tab.url || !tab.url.startsWith('http')) {
+        showBadge('✗', '#f87171');
+        return;
+      }
+      const { settings = {} } = await chrome.storage.local.get('settings');
+      const maxImages = settings.maxImages || 20;
+      const [{ result: pageData }] = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: extractPageFromContext,
+        args: [maxImages]
+      });
+      const result = await saveClip(pageData);
+      if (result.success) {
+        showBadge('✓', '#4ade80');
+      } else if (result.limitReached) {
+        showBadge('🔒', '#f87171');
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: 'icons/icon128.png',
+          title: 'Daily Limit Reached',
+          message: 'Free tier: 5 clips/day. Upgrade to Pro for unlimited clips.'
+        });
+      }
+    } catch (err) {
+      showBadge('✗', '#f87171');
+    }
+  }
+});
+
 // Injected into the page for context menu full-page capture
-function extractPageFromContext() {
+function extractPageFromContext(maxImages) {
+  const imageLimit = maxImages || 20;
   const selectors = ['article', 'main', '[role="main"]', '.post-content', '.article-body', '.entry-content'];
   let text = '';
   for (const selector of selectors) {
@@ -159,7 +223,7 @@ function extractPageFromContext() {
     title: document.title,
     url: window.location.href,
     text,
-    images: images.slice(0, 20),
+    images: images.slice(0, imageLimit),
     citationMeta: (function() {
       var author = '';
       var el = document.querySelector('meta[name="author"]') || document.querySelector('meta[property="article:author"]');
@@ -334,11 +398,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  if (message.action === 'regenerateCitations') {
-    regenerateCitations().then(result => sendResponse(result));
-    return true;
-  }
-
   if (message.action === 'createFolder') {
     createFolder(message.name).then(result => sendResponse(result));
     return true;
@@ -462,7 +521,11 @@ async function saveClip(data) {
   }
 
   clips.unshift(clip);
-  await chrome.storage.local.set({ clips });
+  try {
+    await chrome.storage.local.set({ clips });
+  } catch (err) {
+    return { success: false, error: 'Storage write failed. Your browser storage may be full.' };
+  }
 
   // Track usage
   await incrementUsage('clips');
@@ -589,7 +652,7 @@ async function callAI(settings, text, title) {
   }
 
   if (settings.aiProvider === 'gemini') {
-    const model = settings.model || 'gemini-2.0-flash';
+    const model = settings.model || 'gemini-2.0-flash-lite';
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${settings.apiKey}`, {
       method: 'POST',
       headers: {
@@ -838,12 +901,15 @@ async function captureSession(tabIds) {
   // Filter out chrome:// and extension pages
   const capturableTabs = tabs.filter(t => t.url && t.url.startsWith('http'));
   const results = { captured: 0, failed: 0, clips: [] };
+  const { settings = {} } = await chrome.storage.local.get('settings');
+  const maxImages = settings.maxImages || 20;
 
   for (const tab of capturableTabs) {
     try {
       const [{ result: pageData }] = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        func: extractPageFromContext
+        func: extractPageFromContext,
+        args: [maxImages]
       });
 
       if (pageData && pageData.text) {
@@ -960,11 +1026,13 @@ async function trackTabForTime(tabId, url) {
 
 async function performAutoCapture(tabId, url, state) {
   const { settings = {} } = await chrome.storage.local.get('settings');
+  const maxImages = settings.maxImages || 20;
 
   try {
     const [{ result: pageData }] = await chrome.scripting.executeScript({
       target: { tabId },
-      func: extractPageFromContext
+      func: extractPageFromContext,
+      args: [maxImages]
     });
 
     if (pageData && pageData.text && pageData.text.length > 100) {
@@ -1036,40 +1104,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 // --- Research Features ---
-
-async function regenerateCitations() {
-  const { clips = [] } = await chrome.storage.local.get('clips');
-  let updated = 0;
-
-  for (const clip of clips) {
-    // Build citationMeta from what we have if missing
-    if (!clip.citationMeta) {
-      clip.citationMeta = {
-        author: '',
-        date: '',
-        title: clip.title.replace(/\s*[-|–—]\s*[^-|–—]*$/, '').trim(),
-        siteName: '',
-        publisher: '',
-        url: clip.url,
-        accessDate: clip.createdAt ? clip.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]
-      };
-    }
-
-    // Generate citations
-    try {
-      clip.citations = {
-        apa: generateCitation(clip.citationMeta, 'apa'),
-        mla: generateCitation(clip.citationMeta, 'mla'),
-        harvard: generateCitation(clip.citationMeta, 'harvard'),
-        chicago: generateCitation(clip.citationMeta, 'chicago')
-      };
-      updated++;
-    } catch (e) {}
-  }
-
-  await chrome.storage.local.set({ clips });
-  return { success: true, updated };
-}
 
 async function getFolders() {
   const { researchFolders = [] } = await chrome.storage.local.get('researchFolders');

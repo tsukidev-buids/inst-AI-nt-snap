@@ -240,30 +240,6 @@ async function getInstanceId(deps) {
   return id;
 }
 
-// --- Key Generation (utility — for generating keys to distribute via Ko-fi) ---
-
-function generateLicenseKey(deps) {
-  const { crypto: cryptoImpl } = deps || getDefaultDeps();
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  const randomGroup = () => {
-    let group = '';
-    const bytes = new Uint8Array(4);
-    cryptoImpl.getRandomValues(bytes);
-    for (let i = 0; i < 4; i++) {
-      group += chars[bytes[i] % chars.length];
-    }
-    return group;
-  };
-
-  const g1 = randomGroup();
-  const g2 = randomGroup();
-  const g3 = randomGroup();
-  const payload = g1 + g2 + g3;
-  const checksum = computeChecksum(payload);
-
-  return `SNAP-${g1}-${g2}-${g3}-${checksum}`;
-}
-
 // --- Exports for testing (CJS-compatible) ---
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -291,8 +267,7 @@ if (typeof module !== 'undefined' && module.exports) {
       activateLicenseKey,
       deactivateLicense,
       checkLicenseValidity,
-      getInstanceId,
-      generateLicenseKey
+      getInstanceId
     }
   };
 }

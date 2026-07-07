@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import crypto from 'node:crypto';
+import { generateTestKey } from '../test-helpers.js';
 
 // Load license.js
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -18,7 +19,7 @@ describe('License Key Properties', () => {
   it('every generated key has valid format', () => {
     fc.assert(
       fc.property(fc.integer(), () => {
-        const key = SnapLicense.generateLicenseKey({ crypto });
+        const key = generateTestKey(crypto);
         assert.equal(SnapLicense.isValidKeyFormat(key), true,
           `Generated key ${key} failed format validation`);
       }),
@@ -29,7 +30,7 @@ describe('License Key Properties', () => {
   it('every generated key passes checksum verification', () => {
     fc.assert(
       fc.property(fc.integer(), () => {
-        const key = SnapLicense.generateLicenseKey({ crypto });
+        const key = generateTestKey(crypto);
         assert.equal(SnapLicense.verifyKeyChecksum(key), true,
           `Generated key ${key} failed checksum verification`);
       }),
@@ -43,7 +44,7 @@ describe('License Key Properties', () => {
         fc.integer({ min: 0, max: 2 }),  // which group to modify (0-2 = groups 1-3)
         fc.integer({ min: 0, max: 3 }),  // which char in group to modify
         () => {
-          const key = SnapLicense.generateLicenseKey({ crypto });
+          const key = generateTestKey(crypto);
           const parts = key.split('-');
 
           // Grab the target group (indices 1-3 are the payload groups)
@@ -99,7 +100,7 @@ describe('License Key Properties', () => {
   it('generated keys are unique (no collisions in batch)', () => {
     const keys = new Set();
     for (let i = 0; i < 500; i++) {
-      keys.add(SnapLicense.generateLicenseKey({ crypto }));
+      keys.add(generateTestKey(crypto));
     }
     assert.equal(keys.size, 500, 'Expected 500 unique keys');
   });

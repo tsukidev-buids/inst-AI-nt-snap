@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Inst-AI-nt Snap",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Capture page content instantly. Store locally, summarize with AI later.",
   "permissions": [
     "activeTab",
@@ -41,5 +41,14 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "commands": {
+    "snap-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Snap the current page"
+    }
   }
 }

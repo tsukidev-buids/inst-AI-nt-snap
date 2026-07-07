@@ -5,3 +5,5 @@ keygen.js
 keygen-batch.js
 Generate Snap Keys.bat
 build-release.js
+*.zip
+_release_temp/

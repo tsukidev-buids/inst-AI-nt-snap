@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const citationsSource = readFileSync(resolve(__dirname, '../../citations.js'), 'utf-8');
 const moduleShim = { exports: {} };
 
-// Mock window/document for extractCitationMetadata (won't test that one directly)
+// Load citation functions from citations.js
 const citationsFactory = new Function('module', 'exports',
   citationsSource + '\nmodule.exports = { generateCitation, generateInTextCitation, extractYear };'
 );

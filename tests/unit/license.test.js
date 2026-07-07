@@ -1,6 +1,6 @@
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { createMockChromeStorage, createMockCrypto, createLicenseDeps } from '../test-helpers.js';
+import { createMockChromeStorage, createMockCrypto, createLicenseDeps, generateTestKey } from '../test-helpers.js';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -82,12 +82,12 @@ describe('License Module', () => {
     });
 
     it('verifyKeyChecksum returns true for correctly checksummed key', () => {
-      const key = SnapLicense.generateLicenseKey({ crypto });
+      const key = generateTestKey(crypto);
       assert.equal(SnapLicense.verifyKeyChecksum(key), true);
     });
 
     it('verifyKeyChecksum returns false for tampered key', () => {
-      const key = SnapLicense.generateLicenseKey({ crypto });
+      const key = generateTestKey(crypto);
       // Flip the last character of the checksum
       const parts = key.split('-');
       parts[4] = 'ZZZZ';
@@ -100,21 +100,21 @@ describe('License Module', () => {
     });
   });
 
-  describe('generateLicenseKey()', () => {
+  describe('generateTestKey()', () => {
     it('generates a key in valid format', () => {
-      const key = SnapLicense.generateLicenseKey({ crypto });
+      const key = generateTestKey(crypto);
       assert.equal(SnapLicense.isValidKeyFormat(key), true);
     });
 
     it('generates a key that passes checksum verification', () => {
-      const key = SnapLicense.generateLicenseKey({ crypto });
+      const key = generateTestKey(crypto);
       assert.equal(SnapLicense.verifyKeyChecksum(key), true);
     });
 
     it('generates unique keys', () => {
       const keys = new Set();
       for (let i = 0; i < 50; i++) {
-        keys.add(SnapLicense.generateLicenseKey({ crypto }));
+        keys.add(generateTestKey(crypto));
       }
       assert.equal(keys.size, 50);
     });
@@ -122,7 +122,7 @@ describe('License Module', () => {
 
   describe('activateLicenseKey()', () => {
     it('activates a valid key', async () => {
-      const key = SnapLicense.generateLicenseKey({ crypto });
+      const key = generateTestKey(crypto);
       const result = await SnapLicense.activateLicenseKey(key, deps);
 
       assert.equal(result.success, true);
@@ -135,7 +135,7 @@ describe('License Module', () => {
     });
 
     it('accepts lowercase input and normalizes to uppercase', async () => {
-      const key = SnapLicense.generateLicenseKey({ crypto });
+      const key = generateTestKey(crypto);
       const lower = key.toLowerCase();
       const result = await SnapLicense.activateLicenseKey(lower, deps);
 
@@ -143,7 +143,7 @@ describe('License Module', () => {
     });
 
     it('trims whitespace from input', async () => {
-      const key = SnapLicense.generateLicenseKey({ crypto });
+      const key = generateTestKey(crypto);
       const padded = `  ${key}  `;
       const result = await SnapLicense.activateLicenseKey(padded, deps);
 

@@ -48,7 +48,7 @@ async function handleExtraction(options) {
 
   // Fix #10: Use Readability-style extraction for main content
   const text = structured.text || extractWithReadability() || extractText();
-  const images = extractImages();
+  const images = extractImages(options.maxImages);
 
   // Fix #4: Warn if content seems too short (login wall, empty page)
   const warnings = [];
@@ -671,10 +671,11 @@ function cleanText(text) {
 
 // --- Image Extraction (Fix #8: canvas capture, Fix #14/#15: handled at download) ---
 
-function extractImages() {
+function extractImages(maxImages = 30) {
   const images = [];
   const seen = new Set();
   const minSize = 100;
+  const limit = maxImages || 30;
 
   // Regular images
   document.querySelectorAll('img').forEach(img => {
@@ -721,5 +722,5 @@ function extractImages() {
     }
   });
 
-  return images.slice(0, 30);
+  return images.slice(0, limit);
 }

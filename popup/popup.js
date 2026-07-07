@@ -5,6 +5,7 @@ let currentClips = [];
 async function init() {
   await updateClipCount();
   await updateUsageInfo();
+  await updateAutoCaptureIndicator();
   bindEvents();
 }
 
@@ -69,7 +70,10 @@ async function snapPage() {
 
     const response = await chrome.tabs.sendMessage(tab.id, {
       action: 'extractContent',
-      options: { deepCapture: settings.deepCapture || false }
+      options: {
+        deepCapture: settings.deepCapture || false,
+        maxImages: settings.maxImages || 20
+      }
     });
 
     if (response.error) {
@@ -130,7 +134,7 @@ function showLazyWarning(tab, settings) {
 
     const response = await chrome.tabs.sendMessage(tab.id, {
       action: 'extractContent',
-      options: { deepCapture: false }
+      options: { deepCapture: false, maxImages: settings.maxImages || 20 }
     });
 
     if (!response.error) {
@@ -237,6 +241,7 @@ async function handleDetailAction(e) {
   const id = e.target.dataset.id;
 
   if (action === 'summarize') {
+    e.target.disabled = true;
     e.target.textContent = 'thinking...';
     const result = await chrome.runtime.sendMessage({ action: 'summarizeClip', id });
     if (result.success) {
@@ -245,6 +250,7 @@ async function handleDetailAction(e) {
     } else {
       showStatus(result.error, 'error');
       e.target.textContent = 'summarize';
+      e.target.disabled = false;
     }
   }
 
@@ -323,4 +329,17 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+async function updateAutoCaptureIndicator() {
+  try {
+    const response = await chrome.runtime.sendMessage({ action: 'getAutoCaptureStatus' });
+    if (response.active) {
+      const el = document.getElementById('usage-info');
+      const current = el.textContent;
+      el.textContent = current + ' · auto-shutter on';
+    }
+  } catch (e) {
+    // Not critical
+  }
 }

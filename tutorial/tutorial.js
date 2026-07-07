@@ -4,6 +4,18 @@
  */
 
 async function showTutorial(pageId, steps) {
+  // Prerequisite: welcome tutorial must be completed before page-specific tutorials fire
+  // Fallback: if extension installed >7 days ago and welcome was never seen, skip the gate
+  if (pageId !== 'welcome') {
+    const welcomeData = await chrome.storage.local.get(['tutorial_seen_welcome', 'installed_at']);
+    if (!welcomeData.tutorial_seen_welcome) {
+      const installedAt = welcomeData.installed_at || Date.now();
+      const daysSinceInstall = (Date.now() - installedAt) / (1000 * 60 * 60 * 24);
+      if (daysSinceInstall < 7) return;
+      // After 7 days, let page tutorials through even without welcome completion
+    }
+  }
+
   const storageKey = `tutorial_seen_${pageId}`;
   const data = await chrome.storage.local.get(storageKey);
   if (data[storageKey]) return;

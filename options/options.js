@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('aiProvider').addEventListener('change', toggleAISettings);
 document.getElementById('btn-save').addEventListener('click', saveSettings);
 document.getElementById('btn-export-all').addEventListener('click', exportAll);
+document.getElementById('btn-import-all').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importAll);
 document.getElementById('btn-clear-all').addEventListener('click', clearAll);
 document.getElementById('btn-activate').addEventListener('click', activateLicense);
 document.getElementById('btn-buy').addEventListener('click', () => {
@@ -24,7 +26,6 @@ async function loadSettings() {
   document.getElementById('apiKey').value = settings.apiKey || '';
   document.getElementById('model').value = settings.model || '';
   document.getElementById('maxImages').value = settings.maxImages ?? 20;
-  document.getElementById('includeMetadata').checked = settings.includeMetadata !== false;
 
   toggleAISettings();
   loadLicenseUI();
@@ -97,8 +98,7 @@ async function saveSettings() {
     aiProvider: document.getElementById('aiProvider').value,
     apiKey: document.getElementById('apiKey').value.trim(),
     model: document.getElementById('model').value.trim(),
-    maxImages: parseInt(document.getElementById('maxImages').value) || 20,
-    includeMetadata: document.getElementById('includeMetadata').checked
+    maxImages: parseInt(document.getElementById('maxImages').value) || 20
   };
 
   await chrome.storage.local.set({ settings });
@@ -123,6 +123,48 @@ async function exportAll() {
   URL.revokeObjectURL(url);
 
   showDataStatus(`exported ${clips.length} frames.`, 'success');
+}
+
+async function importAll(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const imported = JSON.parse(text);
+
+    if (!Array.isArray(imported)) {
+      showDataStatus('invalid file. expected a JSON array of clips.', 'error');
+      return;
+    }
+
+    // Validate each clip has at minimum an id and text
+    const valid = imported.filter(c => c && c.id && c.text);
+    if (valid.length === 0) {
+      showDataStatus('no valid clips found in that file.', 'error');
+      return;
+    }
+
+    const { clips = [] } = await chrome.storage.local.get('clips');
+    const existingIds = new Set(clips.map(c => c.id));
+
+    // Only import clips that don't already exist
+    const newClips = valid.filter(c => !existingIds.has(c.id));
+
+    if (newClips.length === 0) {
+      showDataStatus('all clips in that file are already in your roll.', 'error');
+      return;
+    }
+
+    const merged = [...newClips, ...clips];
+    await chrome.storage.local.set({ clips: merged });
+    showDataStatus(`imported ${newClips.length} frames. ${valid.length - newClips.length ? `(${valid.length - newClips.length} duplicates skipped)` : ''}`, 'success');
+  } catch (err) {
+    showDataStatus('couldn\'t read that file. is it valid JSON?', 'error');
+  }
+
+  // Reset the input so the same file can be re-selected
+  e.target.value = '';
 }
 
 async function clearAll() {

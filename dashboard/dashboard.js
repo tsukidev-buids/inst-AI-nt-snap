@@ -14,6 +14,7 @@ async function init() {
   bindModal();
   applyProGating();
   initSnapSelects();
+  bindTooltips();
   document.getElementById('btn-settings').addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });
@@ -698,6 +699,7 @@ async function handleModalAction(e) {
   const id = e.target.dataset.id;
 
   if (action === 'summarize') {
+    e.target.disabled = true;
     e.target.textContent = 'thinking...';
     const result = await chrome.runtime.sendMessage({ action: 'summarizeClip', id });
     if (result.success) {
@@ -705,6 +707,7 @@ async function handleModalAction(e) {
       openClipModal(id);
     } else {
       e.target.textContent = '❌ ' + result.error;
+      e.target.disabled = false;
     }
   }
 
@@ -1063,4 +1066,157 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// --- Sidebar Tooltips ---
+
+const TOOLTIP_MAP = {
+  'library': 'All your captured pages live here. Browse, organize, and open your snaps.',
+  'search': 'Full-text search across everything you\'ve ever snapped.',
+  'prompt-builder': 'Combine multiple snaps into one AI-ready prompt you can upload anywhere.',
+  'session': 'Capture all your open tabs at once. One click, every page.',
+  'auto-capture': 'Set rules to automatically snap pages you linger on.',
+  'research': 'Organize sources into projects, tag quotes, and generate citations.',
+};
+
+const SETTINGS_TOOLTIP = 'Configure capture behavior, manage your license, and export data.';
+const TOOLTIP_DELAY = 400;
+const TOOLTIP_HIDE_DELAY = 150;
+
+let tooltipShowTimer = null;
+let tooltipHideTimer = null;
+let activeTooltip = null;
+
+function bindTooltips() {
+  const navBtns = document.querySelectorAll('.nav-btn[data-view]');
+  const settingsBtn = document.getElementById('btn-settings');
+
+  navBtns.forEach(btn => bindTooltipEvents(btn));
+  if (settingsBtn) bindTooltipEvents(settingsBtn);
+
+  // Hide tooltip on window resize
+  window.addEventListener('resize', () => {
+    clearTooltipTimers();
+    hideTooltipImmediate();
+  });
+}
+
+function bindTooltipEvents(btn) {
+  btn.addEventListener('mouseenter', () => {
+    clearTooltipTimers();
+    hideTooltipImmediate();
+    tooltipShowTimer = setTimeout(() => showTooltip(btn), TOOLTIP_DELAY);
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    clearTimeout(tooltipShowTimer);
+    tooltipShowTimer = null;
+    startHideTimer();
+  });
+
+  btn.addEventListener('focusin', () => {
+    clearTooltipTimers();
+    hideTooltipImmediate();
+    tooltipShowTimer = setTimeout(() => showTooltip(btn), TOOLTIP_DELAY);
+  });
+
+  btn.addEventListener('focusout', () => {
+    clearTimeout(tooltipShowTimer);
+    tooltipShowTimer = null;
+    startHideTimer();
+  });
+}
+
+function showTooltip(btn) {
+  // Determine tooltip text
+  const view = btn.dataset.view;
+  const text = view ? TOOLTIP_MAP[view] : (btn.id === 'btn-settings' ? SETTINGS_TOOLTIP : null);
+  if (!text) return;
+
+  // Remove any existing tooltip
+  hideTooltipImmediate();
+
+  // Create tooltip element
+  const tooltip = document.createElement('div');
+  tooltip.className = 'sidebar-tooltip';
+  tooltip.textContent = text;
+  tooltip.setAttribute('role', 'tooltip');
+
+  // Keep tooltip visible when hovering over it
+  tooltip.addEventListener('mouseenter', () => {
+    clearTimeout(tooltipHideTimer);
+    tooltipHideTimer = null;
+  });
+  tooltip.addEventListener('mouseleave', () => {
+    startHideTimer();
+  });
+
+  // Append to sidebar for positioning context
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.appendChild(tooltip);
+  activeTooltip = tooltip;
+
+  // Position tooltip
+  positionTooltip(btn, tooltip);
+
+  // Trigger animation
+  requestAnimationFrame(() => {
+    tooltip.classList.add('visible');
+  });
+}
+
+function positionTooltip(btn, tooltip) {
+  const btnRect = btn.getBoundingClientRect();
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarRect = sidebar.getBoundingClientRect();
+
+  if (!btnRect || !sidebarRect || btnRect.width === 0) return;
+
+  // Position to the right of the sidebar
+  const tooltipWidth = tooltip.offsetWidth || 200;
+  const gap = 12;
+  const rightEdge = sidebarRect.right + gap + tooltipWidth;
+
+  if (rightEdge > window.innerWidth) {
+    // Overflow: position above the nav item
+    tooltip.classList.add('above');
+    const left = (btnRect.left - sidebarRect.left) + (btnRect.width / 2) - (tooltipWidth / 2);
+    const top = (btnRect.top - sidebarRect.top) - tooltip.offsetHeight - 8;
+    tooltip.style.left = Math.max(4, left) + 'px';
+    tooltip.style.top = top + 'px';
+  } else {
+    // Normal: position to the right
+    const left = sidebarRect.width + gap;
+    const top = (btnRect.top - sidebarRect.top) + (btnRect.height / 2) - (tooltip.offsetHeight / 2);
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+  }
+}
+
+function startHideTimer() {
+  if (tooltipHideTimer) return;
+  tooltipHideTimer = setTimeout(() => {
+    hideTooltipImmediate();
+    tooltipHideTimer = null;
+  }, TOOLTIP_HIDE_DELAY);
+}
+
+function hideTooltipImmediate() {
+  if (activeTooltip) {
+    activeTooltip.classList.remove('visible');
+    const el = activeTooltip;
+    setTimeout(() => el.remove(), 150);
+    activeTooltip = null;
+  }
+}
+
+function clearTooltipTimers() {
+  if (tooltipShowTimer) {
+    clearTimeout(tooltipShowTimer);
+    tooltipShowTimer = null;
+  }
+  if (tooltipHideTimer) {
+    clearTimeout(tooltipHideTimer);
+    tooltipHideTimer = null;
+  }
 }
